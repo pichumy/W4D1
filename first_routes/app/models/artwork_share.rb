@@ -19,7 +19,9 @@ class ArtworkShare < ApplicationRecord
   foreign_key: :viewer_id,
   class_name: :User
 
-
+  has_one :artist,
+  through: :artwork,
+  source: :artist
 
   belongs_to :artwork,
   primary_key: :id,
@@ -30,4 +32,7 @@ class ArtworkShare < ApplicationRecord
   through: :artwork,
   source: :viewers
 
+  def self.viewable_by(own_id)
+    Artwork.left_outer_joins(:viewers).where("viewer_id = #{own_id}").or(Artwork.where("artist_id = #{own_id}"))
+  end
 end
